@@ -5,11 +5,6 @@ Perfect — here’s a polished, **GitHub-ready** `README.md` version with clean
 ```markdown
 # 🕵️‍♂️ NewToken Rug Detector  
 
-![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue?logo=solidity)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Drosera](https://img.shields.io/badge/Compatible-Drosera-orange)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen)
-
 ---
 
 ## 🧩 Overview  
