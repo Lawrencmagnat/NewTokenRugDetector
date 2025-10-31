@@ -185,7 +185,6 @@ then update the deployed contract address in your `drosera.toml` file.
 
 Start the Drosera relay or CLI and watch for rug detection responses.
 
----
 
 ## 🧠 How It Works
 
@@ -195,7 +194,6 @@ Start the Drosera relay or CLI and watch for rug detection responses.
 4. If the drop exceeds the set threshold, Drosera triggers a response action (alert/report).
 5. This system enables decentralized, on-chain rug pull detection for new tokens.
 
----
 
 ## 🧰 Technologies
 
@@ -204,14 +202,11 @@ Start the Drosera relay or CLI and watch for rug detection responses.
 * **Drosera Protocol** — decentralized trap monitoring
 * **UniswapV2 Interface** — for liquidity data access
 
----
-
 ## 📜 License
 
 This project is licensed under the **MIT License**.
 You’re free to use, modify, and distribute it under the same terms.
 
----
 
 ## 💡 Author
 
@@ -220,16 +215,8 @@ Blockchain Expert | DeFi Researcher | Smart Contract Developer
 
 🔗 [Twitter/X](https://x.com/ChukwuLawrencem)  | 🌐 [GitHub](https://github.com/Lawrencmagnat)
 
----
 
 > **Note:** Update the `PAIR` constant in `NewTokenRugDetector.sol` before deploying,
 > using the actual Uniswap pair address you want to monitor.
 
----
-
-```
-
----
-
-Would you like me to add **screenshots and visual diagrams** (e.g., showing how Drosera connects to your Rug Detector flow) to make the README more GitHub-engaging and professional?
-```
+<img width="1354" height="633" alt="image" src="https://github.com/user-attachments/assets/76e236de-5c80-4397-a6e2-b56db1dd11cb" />
