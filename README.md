@@ -1,94 +1,235 @@
-# Drosera Trap Foundry Template
+Perfect — here’s a polished, **GitHub-ready** `README.md` version with clean formatting, emojis, badges, and proper Markdown layout. It’s professional yet engaging, like something you’d proudly showcase on your profile.
 
-This repo is for quickly bootstrapping a new Drosera project. It includes instructions for creating your first trap, deploying it to the Drosera network, and updating it on the fly.
+---
 
-[![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](https://dev.drosera.io "Project documentation")
-[![Twitter](https://img.shields.io/twitter/follow/DroseraNetwork?style=for-the-badge)](https://x.com/DroseraNetwork)
+```markdown
+# 🕵️‍♂️ NewToken Rug Detector  
 
-## Configure dev environment
+![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue?logo=solidity)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Drosera](https://img.shields.io/badge/Compatible-Drosera-orange)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+
+---
+
+## 🧩 Overview  
+
+**NewToken Rug Detector** is a **Drosera-compatible smart contract** that helps detect potential rug pulls for newly launched tokens on UniswapV2-style DEX pairs.  
+
+It works by monitoring the liquidity of a specific pair and flags any large, suspicious liquidity drops that occur within a short time window — an early warning system for “new-token rugs.”
+
+This repository also includes a **ResponseProtocol deployment script** and a **Drosera configuration (.toml)** for easy integration and automation.
+
+---
+
+## 📁 Project Structure  
+
+```
+
+├── src/
+│   └── NewTokenRugDetector.sol         # Main Rug Detector contract
+├── script/
+│   └── DeployResponseProtocol.s.sol    # Script to deploy ResponseProtocol
+├── config/
+│   └── drosera.toml                    # Drosera integration config
+└── README.md
+
+```
+
+---
+
+## ⚙️ Smart Contracts  
+
+### 💣 NewTokenRugDetector.sol  
+
+#### 🧠 Purpose  
+Detect early-stage rug pulls by analyzing the liquidity behavior of a UniswapV2-compatible pair.  
+
+It identifies a rug when liquidity drops sharply (≥ 50% by default) within a short time window (≤ 500 blocks).  
+
+---
+
+### 🔑 Key Constants  
+
+| Variable | Description |
+|-----------|-------------|
+| `PAIR` | Address of the UniswapV2-style liquidity pair being monitored |
+| `THRESHOLD_BPS` | Liquidity drop threshold in basis points (default: 5000 = 50%) |
+| `LAUNCH_WINDOW_BLOCKS` | Max block window where a large drop is considered a rug (default: 500) |
+
+---
+
+### ⚡ Main Functions  
+
+#### `collect()`  
+Safely fetches the total liquidity and current block number from the Uniswap pair.  
+Returns encoded `(totalLiquidity, blockNumber)` values.  
+If the pair doesn’t exist or has no code, it safely returns zero liquidity.  
+
+#### `shouldRespond()`  
+Analyzes multiple data points to detect large liquidity drops within the defined block range.  
+If the drop meets or exceeds the threshold, the function triggers a response flag.  
+
+**Trigger condition:**  
+```
+
+Liquidity drop ≥ THRESHOLD_BPS
+AND
+(latestBlock - oldestBlock) ≤ LAUNCH_WINDOW_BLOCKS
+
+````
+
+---
+
+## 🚀 DeployResponseProtocol Script  
+
+The `DeployResponseProtocol.s.sol` script deploys the **ResponseProtocol** contract to your target network using Foundry.
+
+```solidity
+contract DeployResponseProtocol is Script, Test {
+    function run() external {
+        vm.startBroadcast();
+        ResponseProtocol _responseProtocol = new ResponseProtocol();
+        vm.stopBroadcast();
+    }
+}
+````
+
+### ▶️ Deployment Command
+
+```bash
+forge script script/DeployResponseProtocol.s.sol \
+  --rpc-url <RPC_URL> \
+  --private-key <PRIVATE_KEY> \
+  --broadcast
+```
+
+---
+
+## 🧭 Drosera Integration
+
+The provided **drosera.toml** file allows seamless integration with the Drosera relay system.
+
+### Example Configuration
+
+```toml
+ethereum_rpc = "https://ethereum-hoodi-rpc.publicnode.com/"
+drosera_rpc = "https://relay.hoodi.drosera.io/"
+eth_chain_id = 560048
+drosera_address = "0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D"
+
+[traps]
+
+[traps.new_token_rug_detector]
+path = "out/NewTokenRugDetector.sol/NewTokenRugDetector.json"
+response_contract = "0x0000000000000000000000000000000000000000"
+response_function = ""
+cooldown_period_blocks = 50
+min_number_of_operators = 1
+max_number_of_operators = 3
+block_sample_size = 8
+private_trap = true
+whitelist = ["0xF5b50349E7Dc2be6d8E5ae7293CBE1DB63589cD9"]
+```
+
+### Key Fields
+
+| Field                    | Description                                     |
+| ------------------------ | ----------------------------------------------- |
+| `path`                   | Compiled contract ABI/bytecode path             |
+| `response_contract`      | Address of the response protocol contract       |
+| `cooldown_period_blocks` | Blocks to wait between responses                |
+| `block_sample_size`      | Number of collected data points analyzed        |
+| `private_trap`           | Enables private monitoring mode                 |
+| `whitelist`              | Addresses allowed to access or trigger the trap |
+
+---
+
+## 🛠 Setup & Deployment Guide
+
+### 1️⃣ Install Foundry
 
 ```bash
 curl -L https://foundry.paradigm.xyz | bash
 foundryup
-
-# The trap-foundry-template utilizes node modules for dependency management
-# install Bun (optional)
-curl -fsSL https://bun.sh/install | bash
-
-# install node modules
-bun install
-
-# install vscode (optional)
-# - add solidity extension JuanBlanco.solidity
-
-# install drosera-cli
-curl -L https://app.drosera.io/install | bash
-droseraup
 ```
 
-open the VScode preferences and Select `Soldity: Change workpace compiler version (Remote)`
-
-Select version `0.8.12`
-
-## Quick Start
-
-### Hello World Trap
-
-The drosera.toml file is configured to deploy a simple "Hello, World!" trap. Ensure the drosera.toml file is set to the following configuration:
-
-```toml
-response_contract = "0xdA890040Af0533D98B9F5f8FE3537720ABf83B0C"
-response_function = "helloworld(string)"
-```
-
-To deploy the trap, run the following commands:
+### 2️⃣ Clone the Repository
 
 ```bash
-# Compile the Trap
+git clone https://github.com/<yourusername>/newtoken-rug-detector.git
+cd newtoken-rug-detector
+```
+
+### 3️⃣ Build Contracts
+
+```bash
 forge build
-
-# Deploy the Trap
-DROSERA_PRIVATE_KEY=0x.. drosera apply
 ```
 
-After successfully deploying the trap, the CLI will add an `address` field to the `drosera.toml` file.
-
-Congratulations! You have successfully deployed your first trap!
-
-### Response Trap
-
-You can then update the trap by changing its logic and recompling it or changing the path field in the `drosera.toml` file to point to the Response Trap.
-
-The Response Trap is designed to trigger a response at a specific block number. To test the Response Trap, pick a future block number and update the Response Trap.
-Specify a response contract address and function signature in the drosera.toml file to the following:
-
-```toml
-response_contract = "0x183D78491555cb69B68d2354F7373cc2632508C7"
-response_function = "responseCallback(uint256)"
-```
-
-Finally, deploy the Response Trap by running the following commands:
+### 4️⃣ Deploy ResponseProtocol
 
 ```bash
-# Compile the Trap
-forge build
-
-# Deploy the Trap
-DROSERA_PRIVATE_KEY=0x.. drosera apply
+forge script script/DeployResponseProtocol.s.sol \
+  --rpc-url <RPC_URL> \
+  --private-key <PRIVATE_KEY> \
+  --broadcast
 ```
 
-> Note: The `DROSERA_PRIVATE_KEY` environment variable can be used to deploy traps. You can also set it in the drosera.toml file as `private_key = "0x.."`.
+### 5️⃣ Deploy Rug Detector
 
+Deploy `NewTokenRugDetector.sol` either via Foundry or Remix,
+then update the deployed contract address in your `drosera.toml` file.
 
-### Transfer Event Trap
-The TransferEventTrap is an example of how a Trap can parse event logs from a block and respond to a specific ERC-20 token transfer events.
+### 6️⃣ Connect to Drosera
 
-To deploy the Transfer Event Trap, uncomment the `transfer_event_trap` section in the `drosera.toml` file. Add the token address to the `tokenAddress` constant in the `TransferEventTrap.sol` file and then deploy the trap.
+Start the Drosera relay or CLI and watch for rug detection responses.
 
-## Testing
+---
 
-Example tests are included in the `tests` directory. They simulate how Drosera Operators execute traps and determine if a response should be triggered. To run the tests, execute the following command:
+## 🧠 How It Works
 
-```bash
-forge test
+1. **Drosera Relay** periodically calls `collect()` on the trap contract.
+2. The liquidity and block data are stored as samples.
+3. `shouldRespond()` compares recent samples for liquidity drops.
+4. If the drop exceeds the set threshold, Drosera triggers a response action (alert/report).
+5. This system enables decentralized, on-chain rug pull detection for new tokens.
+
+---
+
+## 🧰 Technologies
+
+* **Solidity (v0.8.20)**
+* **Foundry** — for scripting, testing, and deployment
+* **Drosera Protocol** — decentralized trap monitoring
+* **UniswapV2 Interface** — for liquidity data access
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
+You’re free to use, modify, and distribute it under the same terms.
+
+---
+
+## 💡 Author
+
+**Sir Casper (Casperdtester)**
+Blockchain Expert | DeFi Researcher | Smart Contract Developer
+
+🔗 [Twitter/X](https://x.com/ChukwuLawrencem)  | 🌐 [GitHub](https://github.com/Lawrencmagnat)
+
+---
+
+> **Note:** Update the `PAIR` constant in `NewTokenRugDetector.sol` before deploying,
+> using the actual Uniswap pair address you want to monitor.
+
+---
+
+```
+
+---
+
+Would you like me to add **screenshots and visual diagrams** (e.g., showing how Drosera connects to your Rug Detector flow) to make the README more GitHub-engaging and professional?
 ```
