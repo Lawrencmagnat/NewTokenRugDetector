@@ -1,0 +1,17 @@
+ethereum_rpc = "https://ethereum-hoodi-rpc.publicnode.com/"
+drosera_rpc = "https://relay.hoodi.drosera.io/"
+eth_chain_id = 560048
+drosera_address = "0x91cB447BaFc6e0EA0F4Fe056F5a9b1F14bb06e5D"
+
+[traps]
+
+[traps.new_token_rug_detector]
+path = "out/NewTokenRugDetector.sol/NewTokenRugDetector.json"
+response_contract = "0x0000000000000000000000000000000000000000"
+response_function = ""
+cooldown_period_blocks = 50
+min_number_of_operators = 1
+max_number_of_operators = 3
+block_sample_size = 8
+private_trap = true
+whitelist = ["0xF5b50349E7Dc2be6d8E5ae7293CBE1DB63589cD9"]
